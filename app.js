@@ -29,46 +29,47 @@ const sellerModel = require("./schemas/sellerSchema");
 
 
 //fetch company details based on product name
-app.post("/fetchCompanyDetailBasedProductName", async (req, res) => {
+app.get("/fetchCompanyDetailBasedProductName", async (req, res) => {
     
     const productModel = require("./schemas/productSchema"); 
     const name = req.body.productName;
     const allProduct = await productModel.find();
-    var a=0;
-    
-
-    const allCompany = await productModel.find();
-    var pid;
+       
+    var pid="";
     for(var i = 0; i< allProduct.length; i++)
     {
-       
-        //res.json({data: allProduct[i].title});
         if(allProduct[i].title === name )
         {
             pid = allProduct[i].productId;
         }
         
     }
-    
-    return res.json(pid);
-
-    
-//    return res.json({data: allProduct.length});
-//    const productName = productModel.filter((p) => (p.title === name));
-/*
-    if(productName.length === 1)
+    var flag = false;
+    const companyModel = require("./schemas/companySchema"); 
+    var foundCompany = [];
+    const allCompany = await companyModel.find();
+    if(pid != "")
     {
-        const companyDetail = companyModel.filter((c) => 
-            c.productIds.forEach(pid => {
-                if(pid === p.productIds) {
-                    res.json({data: pid});
-                }
-            })
-        
-        
-        );
+        for(var i = 0; i< allCompany.length; i++)
+        {
+            flag = false;
+            const arr = allCompany[i].productIds;
+            //return res.json({data: arr.length});
+            arr.forEach(p => {
+                if(pid === p)
+                {
+                    flag = true;
+                    return;
+                } 
+            });
+            if(flag)
+            {
+                foundCompany.push(allCompany[i]);
+            }   
+        }  
+        return res.json({data: foundCompany});         
     }
-*/
+    return res.json({data: "Not found"});
 });
 
 
